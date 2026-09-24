@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "KORO",
+    "slug": "koro",
+    "scheme": "koro",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#12121A"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nery.koro",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#12121A"
+      },
+      "package": "com.nery.koro",
+      "versionCode": 1
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/icon.png",
+      "backgroundColor": "#12121A"
+    },
+    "plugins": ["expo-router", "expo-secure-store", "expo-notifications", "expo-audio"],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "REEMPLAZA_CON_TU_PROJECT_ID_DE_EAS"
+      }
+    }
+  }
+}

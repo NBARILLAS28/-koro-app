@@ -1,0 +1,13 @@
+[build]
+  publish = "dist"
+  command = "npx expo export -p web"
+
+# KORO es una SPA (single-page app): expo-router maneja las rutas del lado
+# del cliente (/login, /community/xyz, /song/abc, etc). Sin esta regla,
+# refrescar la página en cualquier ruta que no sea la raíz, o compartir un
+# link directo a una comunidad/canción, daría 404 — Netlify serviría el
+# archivo tal cual en vez de dejar que la app decida qué mostrar.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
