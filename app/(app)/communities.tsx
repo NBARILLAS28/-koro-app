@@ -5,7 +5,7 @@ import { useFocusEffect, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/AuthContext';
 import { Community } from '@/types';
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, spacing, webSafeBottom } from '@/theme';
 import { friendlyError, withRetry } from '@/lib/errors';
 import { useToast } from '@/components/Toast';
 
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: { color: colors.text, fontSize: 17, fontWeight: '700' },
   cardCode: { color: colors.textMuted, marginTop: spacing(1), fontSize: 13 },
-  actions: { flexDirection: 'row', gap: spacing(3), padding: spacing(4) },
+  actions: { flexDirection: 'row', gap: spacing(3), padding: spacing(4), paddingBottom: spacing(4) + webSafeBottom },
   actionButton: { flex: 1, backgroundColor: colors.primary, borderRadius: radius.md, padding: spacing(4), alignItems: 'center' },
   secondary: { backgroundColor: colors.surfaceAlt, borderWidth: 1, borderColor: colors.border },
   actionText: { color: '#12121A', fontWeight: '700' },

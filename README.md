@@ -90,6 +90,7 @@ La primera vez que uses `--tunnel` te va a pedir iniciar sesión con una cuenta 
 - ✅ **Recuperar contraseña**: enlace "¿Olvidaste tu contraseña?" en el login, envía un correo con un link que abre la app directo en la pantalla de nueva contraseña
 - ✅ **Eliminar cuenta**: desde Perfil, borra la cuenta por completo (requisito de Apple); las comunidades creadas sobreviven para los demás integrantes
 - ✅ **Versión web**: el mismo proyecto exporta a un sitio estático (HTML/JS/CSS), desplegable gratis en Netlify, conectado al mismo Supabase
+- ✅ **Tonalidad oficial sincronizada**: el botón "Guardar como tonalidad oficial" convierte la vista previa de transposición en el cifrado real guardado — se propaga en tiempo real (Realtime) a cualquiera que tenga esa canción abierta, sin recargar
 - ✅ **Soporte básico para tablet/pantallas anchas**: el contenido se centra en una columna de lectura cómoda
 
 ## 7. Cómo funciona el Director en vivo
@@ -332,6 +333,19 @@ Ya viene listo para que, al abrir la web en el celular y usar "Agregar a inicio"
 
 - **Notificaciones push** — el sistema que construimos es 100% para apps nativas (usa el token de Expo Push). En web simplemente no se activan; el resto de la app funciona normal.
 - Cualquier limitación propia del navegador (por ejemplo, el audio del metrónomo puede necesitar que el usuario interactúe con la página primero, por las políticas de autoplay de los navegadores — es una restricción del navegador, no de KORO).
+
+## 19. Tonalidad oficial sincronizada — cómo funciona y por qué no es automático
+
+Cuando cambias la tonalidad con +/- en la pantalla de una canción, eso sigue siendo solo una **vista previa** (como antes) — nada se guarda todavía. En cuanto la tonalidad previsualizada es distinta a la original, aparece un botón: **"Guardar [tono] como tonalidad oficial"**.
+
+Al tocarlo:
+- Reescribe de verdad `songs.original_key` **y** el texto de `songs.lyrics_chordpro` (el cifrado completo, no solo una etiqueta) con los acordes ya transportados.
+- Limpia cualquier tonalidad especial que ese setlist tuviera guardada para esa canción (ya no aplica — el original ahora ES esa tonalidad).
+- Se propaga **en tiempo real** vía Supabase Realtime: cualquier otro integrante que tenga esa misma canción abierta en ese momento ve el cambio reflejado al instante, sin recargar la pantalla.
+
+**Por qué el +/- no guarda directo, a pesar de que pediste que fuera "oficial para todos":** un botón tan fácil de tocar por accidente (o para solo "probar cómo suena") no debería poder reescribir el cifrado real de toda la comunidad con cada toque — eso arruinaría canciones sin querer. El paso extra de "Guardar como oficial" mantiene la vista previa instantánea de siempre, pero hace que el cambio permanente sea una decisión a propósito, no un accidente de un toque de más.
+
+**Restricción a propósito**: mientras estás transmitiendo esa canción en vivo (Director en vivo), el botón de guardar se oculta y en su lugar aparece un aviso — no tiene sentido reescribir el cifrado maestro de la canción en medio de una presentación en vivo; primero hay que finalizar la transmisión.
 
 ## Estructura del proyecto
 

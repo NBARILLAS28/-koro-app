@@ -4,7 +4,7 @@ import { showAlert } from '@/lib/alert';
 import { useLocalSearchParams, useFocusEffect, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Song, Comment, SetlistSong } from '@/types';
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, spacing, webSafeBottom } from '@/theme';
 import { parseChordProLine, semitoneDistance, shiftKey, transposeChordPro } from '@/utils/chords';
 import * as WebBrowser from 'expo-web-browser';
 import { useLiveSession } from '@/lib/useLiveSession';
@@ -172,6 +172,68 @@ export default function SongScreen() {
     }
   };
 
+  // Convierte la vista previa de transposición en el cifrado real y guardado
+  // de la canción — a partir de aquí es la tonalidad oficial para TODOS los
+  // integrantes de la comunidad, no solo una vista temporal de esta pantalla.
+  // Se propaga en tiempo real vía la suscripción de abajo (Realtime sobre la
+  // fila de esta canción), que ya cualquier otro dispositivo viéndola recibe.
+  const [savingOfficial, setSavingOfficial] = useState(false);
+  const saveOfficialTranspose = async () => {
+    if (!song || semitoneShift === 0) return;
+    setSavingOfficial(true);
+    const newKey = currentKey;
+    const newLyrics = transposedLyrics;
+
+    const { error } = await supabase
+      .from('songs')
+      .update({ original_key: newKey, lyrics_chordpro: newLyrics, updated_at: new Date().toISOString() })
+      .eq('id', song.id);
+
+    // El override de este setlist ya no aplica: el original ya ES la tonalidad
+    // que se estaba mostrando, así que se limpia para no calcular un desfase
+    // sobre la nueva referencia.
+    if (!error && setlistSong) {
+      await supabase.from('setlist_songs').update({ transposed_key: null }).eq('id', setlistSong.id);
+    }
+
+    setSavingOfficial(false);
+    if (error) {
+      showAlert('No se pudo guardar', friendlyError(error));
+      return;
+    }
+    setSong({ ...song, original_key: newKey, lyrics_chordpro: newLyrics });
+    setSemitoneShift(0);
+    showToast('Tonalidad oficial actualizada ✓');
+  };
+
+  // Escucha cambios en tiempo real de ESTA canción (Realtime) — si alguien más
+  // guarda una nueva tonalidad oficial (o edita la letra) mientras la tengo
+  // abierta, la veo reflejada al instante sin tener que recargar. Canal único
+  // por instancia (evita el choque de "cannot add postgres_changes callbacks
+  // ... after subscribe()" cuando dos pantallas escuchan la misma comunidad).
+  useEffect(() => {
+    if (!id) return;
+    const uniqueId = Math.random().toString(36).slice(2);
+    const channel = supabase
+      .channel(`song:${id}:${uniqueId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'songs', filter: `id=eq.${id}` },
+        (payload) => {
+          const updated = payload.new as Song;
+          setSong((prev) => (prev ? { ...prev, ...updated } : updated));
+          // La tonalidad "base" cambió — la vista previa local vuelve a cero
+          // para no sumarse sobre la referencia nueva (evita un doble desfase).
+          setSemitoneShift(0);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [id]);
+
   // Abre una búsqueda en el navegador (no copiamos ni mostramos el contenido de
   // estos sitios dentro de la app — solo enlazamos afuera, como un marcador).
   // Así evitamos cualquier problema de derechos de autor sobre letras/acordes
@@ -279,6 +341,20 @@ export default function SongScreen() {
           <Text style={styles.keyButtonText}>+</Text>
         </Pressable>
       </View>
+
+      {semitoneShift !== 0 && !offline && (
+        isBroadcastingThisSong ? (
+          <Text style={styles.saveOfficialHint}>
+            Estás transmitiendo en vivo — finaliza la transmisión para guardar esta tonalidad como oficial.
+          </Text>
+        ) : (
+          <Pressable style={styles.saveOfficialBtn} onPress={saveOfficialTranspose} disabled={savingOfficial}>
+            <Text style={styles.saveOfficialBtnText}>
+              {savingOfficial ? 'Guardando...' : `Guardar ${currentKey} como tonalidad oficial`}
+            </Text>
+          </Pressable>
+        )
+      )}
 
       {/* Metrónomo — local a este dispositivo, nunca sincronizado por red */}
       <View style={styles.metroBar}>
@@ -522,6 +598,22 @@ const styles = StyleSheet.create({
   keyLabel: { color: colors.textMuted, fontSize: 11, textTransform: 'uppercase' },
   keyValue: { color: colors.primary, fontSize: 28, fontWeight: '800' },
   keyOriginal: { color: colors.textMuted, fontSize: 11 },
+  saveOfficialBtn: {
+    marginHorizontal: spacing(4),
+    marginTop: spacing(2),
+    backgroundColor: colors.primaryMuted,
+    borderRadius: radius.sm,
+    paddingVertical: spacing(2.5),
+    alignItems: 'center',
+  },
+  saveOfficialBtnText: { color: colors.text, fontWeight: '700', fontSize: 13 },
+  saveOfficialHint: {
+    marginHorizontal: spacing(4),
+    marginTop: spacing(2),
+    color: colors.textMuted,
+    fontSize: 11,
+    textAlign: 'center',
+  },
   metroBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -576,7 +668,7 @@ const styles = StyleSheet.create({
   commentSendText: { color: '#12121A', fontWeight: '700' },
   autoscrollBar: {
     position: 'absolute',
-    bottom: spacing(6),
+    bottom: spacing(6) + webSafeBottom,
     left: spacing(4),
     right: spacing(4),
     backgroundColor: colors.surface,

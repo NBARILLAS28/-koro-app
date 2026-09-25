@@ -1,4 +1,6 @@
 // Paleta KORO — oscuro, cálido, con acento dorado (guiño al "Oro" del nombre)
+import { Platform } from 'react-native';
+
 export const colors = {
   background: '#12121A',
   surface: '#1C1C28',
@@ -20,3 +22,11 @@ export const radius = {
   md: 14,
   lg: 22,
 };
+
+// El plan gratis de Netlify agrega un badge flotante "Powered by Netlify"
+// fijo abajo a la derecha de la pantalla, que no existe en la app nativa
+// (solo aparece en la versión web). Este extra empuja hacia arriba cualquier
+// botón/barra que tengamos anclado al fondo de la pantalla en web, para que
+// el badge de Netlify no lo tape.
+export const webSafeBottom = Platform.OS === 'web' ? 64 : 0;
+
