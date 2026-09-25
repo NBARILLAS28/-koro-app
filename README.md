@@ -91,6 +91,7 @@ La primera vez que uses `--tunnel` te va a pedir iniciar sesión con una cuenta 
 - ✅ **Eliminar cuenta**: desde Perfil, borra la cuenta por completo (requisito de Apple); las comunidades creadas sobreviven para los demás integrantes
 - ✅ **Versión web**: el mismo proyecto exporta a un sitio estático (HTML/JS/CSS), desplegable gratis en Netlify, conectado al mismo Supabase
 - ✅ **Tonalidad oficial sincronizada**: el botón "Guardar como tonalidad oficial" convierte la vista previa de transposición en el cifrado real guardado — se propaga en tiempo real (Realtime) a cualquiera que tenga esa canción abierta, sin recargar
+- ✅ **Botones de "volver" más fáciles de tocar**: área táctil ampliada (`hitSlop`) en los 7 botones de volver de la app — el texto solo no daba suficiente margen para el dedo, sobre todo notorio en web
 - ✅ **Soporte básico para tablet/pantallas anchas**: el contenido se centra en una columna de lectura cómoda
 
 ## 7. Cómo funciona el Director en vivo

@@ -295,7 +295,7 @@ export default function SongScreen() {
         scrollEventThrottle={32}
       >
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.back()} hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}>
           <Text style={styles.back}>‹ Volver</Text>
         </Pressable>
         <Text style={styles.title}>{song.title}</Text>

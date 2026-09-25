@@ -6,7 +6,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { supabase } from '@/lib/supabase';
 import { SetlistSong, Setlist } from '@/types';
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, spacing, webSafeBottom } from '@/theme';
 import { friendlyError } from '@/lib/errors';
 import { useLiveSession } from '@/lib/useLiveSession';
 import { useMemberRole } from '@/lib/useMemberRole';
@@ -212,7 +212,7 @@ export default function SetlistScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.back()} hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}>
           <Text style={styles.back}>‹ Volver</Text>
         </Pressable>
         <Text style={styles.title}>{setlist?.title ?? '...'}</Text>
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
 
   fab: {
     position: 'absolute',
-    bottom: spacing(6),
+    bottom: spacing(6) + webSafeBottom,
     alignSelf: 'center',
     backgroundColor: colors.primary,
     borderRadius: radius.lg,

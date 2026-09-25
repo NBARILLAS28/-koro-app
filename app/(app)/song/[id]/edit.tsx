@@ -85,7 +85,7 @@ export default function EditSongScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.back()} hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}>
           <Text style={styles.back}>‹ Cancelar</Text>
         </Pressable>
         <Text style={styles.title}>{song.title}</Text>

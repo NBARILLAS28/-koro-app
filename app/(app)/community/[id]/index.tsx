@@ -99,7 +99,7 @@ export default function CommunityScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.back()} hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}>
           <Text style={styles.back}>‹ Comunidades</Text>
         </Pressable>
         <Text style={styles.title}>{community.name}</Text>
